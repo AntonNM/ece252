@@ -58,12 +58,74 @@ typedef struct simple_PNG {
     struct chunk *p_IEND;
 } *simple_PNG_p;
 
+
+
+
 /******************************************************************************
  * FUNCTION PROTOTYPES 
  *****************************************************************************/
-int is_png(U8 *buf, size_t n);
-int get_png_height(struct data_IHDR *buf);
-int get_png_width(struct data_IHDR *buf);
-int get_png_data_IHDR(struct data_IHDR *out, FILE *fp, long offset, int whence);
+int is_png(U8* buf, size_t n) {
+
+    return 0;
+};
+int get_png_height(struct data_IHDR* buf) {
+    return 0;
+};
+int get_png_width(struct data_IHDR* buf) {
+    return 0;
+};
+int get_png_data_IHDR(struct data_IHDR* out, FILE* fp, long offset, int whence) {
+    
+    return 0;
+};
+
+
+#include "crc.h"
+#include <string.h>
+
+int check_png_crc(struct simple_PNG *png, char *msg) {
+
+    //check_chunck_crc(png->p_IHDR);
+
+    int returnCode = 0;
+    int computedCRC;
+
+   // struct chunk* tmp[3] = 
+    
+    //Check Header
+    struct chunk *tmp= png->p_IHDR;
+    computedCRC = crc(tmp->type, CHUNK_TYPE_SIZE + tmp->length);
+
+    if (tmp->crc != computedCRC) {
+         fprintf(stderr, "IHDR chunk CRC error: computed %d, expected %d", computedCRC, tmp->crc); // str cat
+        returnCode = -1;
+
+    }
+    
+    //Check Data
+    tmp = png->p_IDAT;
+    computedCRC = crc(tmp->type, CHUNK_TYPE_SIZE + tmp->length);
+    if (tmp->crc != computedCRC) {
+        fprintf(stderr, "IDAT chunk CRC error: computed %d, expected %d", computedCRC, tmp->crc);
+        returnCode = -1;
+    }
+
+    //Check End
+
+    tmp = png->p_IEND;
+    computedCRC = crc(tmp->type, CHUNK_TYPE_SIZE + tmp->length);
+    if (tmp->crc != computedCRC) {
+        fprintf(stderr, "IEND chunk CRC error: computed %d, expected %d", computedCRC, tmp->crc);
+        returnCode = -1;
+    } 
+
+
+
+
+    return returnCode;
+}
+
+
 
 /* declare your own functions prototypes here */
+
